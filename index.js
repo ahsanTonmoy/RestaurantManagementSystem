@@ -27,21 +27,66 @@ async function run() {
   try {
     // Connect the client to the server	(optional starting in v4.7)
     await client.connect();
+    const menuCollection = client.db('RMSDB').collection('menuData');
+    const cartsCollection = client.db('RMSDB').collection('cartsData');
+    // start
+
+    // ---------- menu collection -----------//
+
+    // find menu data
+    app.get('/menu', async (req, res) => {
+      const result = await menuCollection.find().toArray();
+      res.send(result);
+    })
+
+    // ---------- menu collection end -----------//
+
+    // ---------- cart collection -----------//
+
+    // save cart data 
+    app.post('/carts', async(req, res)=>{
+      const cartItm = req.body;
+      const result = await cartsCollection.insertOne(cartItm);
+      res.send(result)
+    })
+
+    app.get('/carts', async(req,res)=>{
+      const email = req.query.email;
+      const query = {email: email};
+      const result = await cartsCollection.find(query).toArray();
+      res.send(result)
+    })
+
+    // ---------- cart collection end -----------//
+
+
+
+    // end
+    
+
     // Send a ping to confirm a successful connection
     await client.db("admin").command({ ping: 1 });
     console.log("Pinged your deployment. You successfully connected to MongoDB!");
   } finally {
     // Ensures that the client will close when you finish/error
-    await client.close();
+    // await client.close();
   }
 }
 run().catch(console.dir);
+// start
 
-// 
+// menu collection
 app.get('/', (req, res) => {
-    res.send('rsm server is runing check')
+  res.send('rsm server is runing check')
 })
 
+// 
+
+// cart collections
+
+
+// end
+
 app.listen(port, () => {
-    console.log(`server is runing on port ${port}`)
+  console.log(`server is runing on port ${port}`)
 })
